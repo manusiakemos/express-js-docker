@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  mysql:
+    build:
+      context: "mysql"
+      dockerfile: "Dockerfile"
+      args:
+        - MYSQL_VERSION=${MYSQL_VERSION}
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - TZ=${WORKSPACE_TIMEZONE}
+    ports:
+      - '${MYSQL_PORT}:3306'
+    expose:
+      - '${MYSQL_PORT}'
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - backend
+  node:
+    working_dir: /home/node/app
+    build:
+      context: .
+      dockerfile: "node/Dockerfile"
+    restart: no
+    environment:
+      DB_SCHEMA: mysql
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_USER}
+      DB_HOST: mysql
+    depends_on:
+      - mysql
+    ports:
+      - ${WORKSPACE_PORT}:3000
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./src:/home/node/app
+      - /home/node/app/node_modules
+    command: npm run nodemon
+    networks:
+      - backend
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+volumes:
+  src:
+    driver: local
+  db:
+    driver: local
