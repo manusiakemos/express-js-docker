@@ -2,13 +2,13 @@
 ## Docker
 - [x] mysql
 - [x] node express js
-- [] redis
-- [] nginx and reverse proxy
+- [ ] redis
+- [ ] nginx and reverse proxy
 
 ## Express
 - [x] sequelize
 - [x] pagination
-- [] sorting
+- [ ] sorting
 
 ## Command
 `docker compose up -d`
